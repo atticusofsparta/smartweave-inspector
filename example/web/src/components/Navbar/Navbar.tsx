@@ -97,6 +97,7 @@ function ForumPopover() {
   );
 }
 
+
 function Navbar() {
   return (
     <div className="navbar">

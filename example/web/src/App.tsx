@@ -3,7 +3,7 @@ import {
   Navigate,
   Route,
   RouterProvider,
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
 } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ import {
 } from './components/pages';
 
 function App() {
-  const router = createBrowserRouter(
+  const router = createHashRouter(
     createRoutesFromElements(
       <Route element={<Layout />} errorElement={<NotFound />}>
         <Route path="/" element={<Home />} />

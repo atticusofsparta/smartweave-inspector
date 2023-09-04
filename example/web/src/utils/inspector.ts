@@ -1,9 +1,7 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const traverse = require("@babel/traverse").default;
 import Arweave from "arweave";
-import { ParseResult, parse } from "@babel/parser";
-import { getSwitchCases } from "./utils";
+import { parse } from "@babel/parser";
+import traverse from "@babel/traverse";
+
 class SWInspector {
   source;
   schemas;
@@ -139,5 +137,28 @@ class SWInspector {
   }
 }
 
+
+
+export function getSwitchCases (switchStatement:any) {
+
+    if (!switchStatement?.cases) {
+        return []
+    }
+    const cases = switchStatement.cases?.map((node: any) => {
+        const isAwaited = node.consequent[0].argument.type === "AwaitExpression";
+        const arg = isAwaited ? node.consequent[0].argument.argument : node.consequent[0].argument;
+        const contractFunctionName = node.test?.value;
+        // function args can be identifiers or ObjectExpression
+        const functionName = arg.callee?.name
+        const functionArgs = arg.arguments
+        return {
+            functionName,
+            contractFunctionName,
+            functionArgs,
+        };
+        });
+
+        return cases
+}
 
 export default SWInspector;

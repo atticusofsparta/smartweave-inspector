@@ -21,18 +21,3 @@ export function getSwitchCases (switchStatement:any) {
 
         return cases
 }
-
-export function functionArgFlatMap (args:any[]) {
-
-    const flatMap = args.flatMap((arg:any) => {
-        if (arg.type === "Identifier") {
-            return arg.name;
-        } else if (arg.type === "ObjectExpression") {
-            return arg.properties.map((prop:any) => {
-                return prop.value.name;
-            });
-        }
-    });
-
-    return flatMap;
-}

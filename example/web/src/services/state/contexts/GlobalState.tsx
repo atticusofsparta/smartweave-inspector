@@ -2,16 +2,23 @@ import React, { Dispatch, createContext, useContext, useReducer } from 'react';
 
 import type { Action } from '../reducers/GlobalStateReducer';
 import { ArweaveWalletConnector } from '../../../types/arweave';
+import Arweave from 'arweave';
 
 export type GlobalState = {
   walletAddress?: string;
   wallet?: ArweaveWalletConnector;
   rpcUrl?: string;
+  arweave: Arweave
 };
 
 const initialState: GlobalState = {
   walletAddress: undefined,
   wallet: undefined,
+  arweave:Arweave.init({
+    host: 'arweave.net',
+    port: 443,
+    protocol: 'https',
+  })
 };
 
 const GlobalStateContext = createContext<[GlobalState, Dispatch<Action>]>([
