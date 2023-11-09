@@ -8,13 +8,13 @@ function Footer() {
   return (
     <div className="footer dark">
       <div className="footer-links dark">
-        <a href="https://discord.com/your_discord_link">
+        <a href="https://discord.gg/PkjjV4KW">
           <DiscordLogoIcon /> Discord
         </a>
-        <a href="https://t.me/your_telegram_link">
+        <a href="https://github.com/atticusofsparta/smartweave-inspector">
           <GitHubLogoIcon /> Github
         </a>
-        <a href="https://twitter.com/your_twitter_handle">
+        <a href="https://twitter.com/SanOfABee">
           <TwitterLogoIcon /> Twitter
         </a>
         <a href="https://yourwebsite.com/terms-and-conditions">

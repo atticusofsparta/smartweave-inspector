@@ -38,9 +38,6 @@ function Contract() {
       const inspector = new SWInspector(contractCode.toString());
       const contractFunctions = await inspector.getContractFunctions();
       setContractFunctions(contractFunctions);
-      console.log(contractFunctions);
-      console.log(await inspector.generateAST());
-      console.log(inspector.source);
     } catch (error) {
       console.error(error);
     }

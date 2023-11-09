@@ -10,9 +10,8 @@ import { useGlobalState } from '../../services/state/contexts/GlobalState';
 function ContractCard({ id }: { id: string }) {
   const [{ arweave }] = useGlobalState();
   const [manifest, setManifest] = useState<any>(null);
-  const [state, setState] = useState<any>(null);
+  const [contractState, setContractState] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const warp = WarpFactory.forMainnet(defaultCacheOptions, true);
 
   useEffect(() => {
     load(id);
@@ -21,12 +20,9 @@ function ContractCard({ id }: { id: string }) {
   async function load(id: string) {
     try {
       setLoading(true);
-      const contract = await warp.contract(id);
-      const res = await contract
-        .setEvaluationOptions({ maxInteractionEvaluationTimeSeconds: 1 })
-        .readState();
-
-      setState(res.cachedValue.state);
+      const res = await fetch(`http://dev.arns.app/v1/contract/${id}`);
+      const { state } = await res.json();
+      setContractState(state);
       const contractManifest = await getEvaluationOptions(id);
       setManifest(contractManifest);
     } catch (error) {
@@ -87,16 +83,28 @@ function ContractCard({ id }: { id: string }) {
             visible={true}
           />
         ) : (
-          <ReactJson src={manifest} theme={'chalk'} style={{ width: '100%' }} />
+          <ReactJson
+            src={contractState}
+            theme={'chalk'}
+            style={{ width: '100%' }}
+            shouldCollapse={(field) =>
+              field.name !== ('root' || 'name' || 'ticker' || 'owner')
+            }
+          />
         )}
       </div>
       <div className="flex flex-row" style={{ gap: '20px' }}>
         <Identicon string={id} size={40} />
         <div className="flex flex-column">
           <span>
-            {state?.name ?? state?.nickname ?? state?.ticker ?? 'Contract'}
+            {contractState?.name ??
+              contractState?.nickname ??
+              contractState?.ticker ??
+              'Contract'}
           </span>
-          <Link to={`/contract/${id}`}>{id}</Link>
+          <Link style={{ color: 'gold' }} to={`/contract/${id}`}>
+            {id}
+          </Link>
         </div>
       </div>
     </div>

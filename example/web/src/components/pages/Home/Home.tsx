@@ -19,14 +19,13 @@ function Home() {
   async function getDeployedContracts(address: string) {
     try {
       setLoading(true);
-      const res = await arweave.api.post(
-        '/graphql',
-        deployedContractQuery(address),
+      const res = await fetch(
+        `http://dev.arns.app/v1/wallet/${address}/contracts`,
       );
-      const contractIds = res.data.data.transactions.edges.map(
-        (e: any) => e.node.id,
-      );
-      setDeployedContracts(contractIds);
+
+      const { contractTxIds } = await res.json();
+
+      setDeployedContracts(contractTxIds);
     } catch (error) {
       console.error(error);
     } finally {
@@ -44,6 +43,9 @@ function Home() {
         <span style={{ color: 'var(--tomato-9)' }}>SmartWeave</span> inspector
       </h1>
       <h2 style={{ color: 'var(--yellow-8)' }}>Deployed contracts:</h2>
+      <p style={{ color: 'var(--yellow-8)' }}>
+        Click on the ID to interact with the contract!
+      </p>
       <div
         className="flex-row flex justify-center"
         style={{

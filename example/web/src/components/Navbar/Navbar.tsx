@@ -28,7 +28,10 @@ function DeveloperPopover() {
             Documentation
           </Link>
 
-          <Link className="link" to="http://github.com/">
+          <Link
+            className="link"
+            to="https://github.com/atticusofsparta/smartweave-inspector"
+          >
             <GitHubLogoIcon /> Github
           </Link>
 
@@ -97,7 +100,6 @@ function ForumPopover() {
   );
 }
 
-
 function Navbar() {
   return (
     <div className="navbar">
@@ -109,7 +111,7 @@ function Navbar() {
           }}
         >
           <CodeSandboxLogoIcon width={30} height={30} />
-         Smartweave Inspector
+          Smartweave Inspector
         </div>
       </Link>
       <Search />
