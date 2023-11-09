@@ -39,6 +39,8 @@ function Contract() {
       const contractFunctions = await inspector.getContractFunctions();
       setContractFunctions(contractFunctions);
       console.log(contractFunctions);
+      console.log(await inspector.generateAST());
+      console.log(inspector.source);
     } catch (error) {
       console.error(error);
     }
@@ -55,7 +57,10 @@ function Contract() {
   return (
     <div className="page flex" style={{ padding: '20px 5%' }}>
       <h1>Contract Interface</h1>
-      <div className="flex flex-column align-center" style={{width:"100%", gap:"30px"}}>
+      <div
+        className="flex flex-column align-center"
+        style={{ width: '100%', gap: '30px' }}
+      >
         {contractFunctions.map((func) => (
           <ContractFunctionInput
             functionName={Object.keys(func).at(-1) as string}

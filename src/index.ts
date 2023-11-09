@@ -80,7 +80,10 @@ class SWInspector {
                         ArrowFunctionExpression: (path: any) => {
                           path.traverse({
                             ObjectProperty: (path: any) => {
-                              if (path.node.key?.name === "input" && path?.node?.value?.properties) {
+                              if (
+                                path.node.key?.name === "input" &&
+                                path?.node?.value?.properties
+                              ) {
                                 requiredInputs?.push(
                                   ...path?.node?.value?.properties?.map(
                                     (prop: any) => {
@@ -94,6 +97,17 @@ class SWInspector {
                                     }
                                   )
                                 );
+                              }
+                            },
+                            VariableDeclarator: (path: any) => {
+                              if (path.node?.init?.name === "input") {
+                                path.node?.id?.properties?.map(
+                                  (prop: any) =>
+                                    requiredInputs?.push(prop.key.name)
+                                );
+                              }
+                              if (path.node?.init?.object?.name === "input") {
+                                requiredInputs?.push(path.node?.id?.name);
                               }
                             },
                           });
@@ -138,6 +152,5 @@ class SWInspector {
     return functions;
   }
 }
-
 
 export default SWInspector;

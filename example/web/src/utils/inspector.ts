@@ -1,8 +1,8 @@
-import Arweave from "arweave";
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import Arweave from 'arweave';
 
-class SWInspector {
+export class SWInspector {
   source;
   schemas;
   errors: Error[] = [];
@@ -10,16 +10,16 @@ class SWInspector {
   constructor(
     sourceCode: string, // source code to parse
     jsonSchemas?: Array<any>, // AJV JSON Schema object
-    customArweave?: Arweave
+    customArweave?: Arweave,
   ) {
     this.source = sourceCode; // parse source code for ast eval
     this.schemas = jsonSchemas; // AJV JSON Schema object
     this.arweave =
       customArweave ??
       Arweave.init({
-        host: "arweave.net",
+        host: 'arweave.net',
         port: 443,
-        protocol: "https",
+        protocol: 'https',
       }); // arweave instance
   }
 
@@ -27,7 +27,7 @@ class SWInspector {
     // build AST tree ~ get functions and their props from source code
     // put ast tree into this.ast
     const ast = parse(this.source, {
-      sourceType: "module",
+      sourceType: 'module',
     });
 
     return ast;
@@ -47,9 +47,9 @@ class SWInspector {
 
     traverse(ast, {
       SwitchStatement: (path: any) => {
-        if (path.node.discriminant?.property?.name === "function") {
+        if (path.node.discriminant?.property?.name === 'function') {
           // nullish coalescing assignment operator (say that three times fast)
-          handlerType ??= "switch";
+          handlerType ??= 'switch';
           // todo: check for func(state, action) pattern
           const contractFunctions = getSwitchCases(path.node);
           if (contractFunctions.length) {
@@ -65,7 +65,7 @@ class SWInspector {
                     if (path.node.id.name === functionName) {
                       path.traverse({
                         MemberExpression: (path: any) => {
-                          if (path.node.object.property?.name === "input") {
+                          if (path.node.object.property?.name === 'input') {
                             requiredInputs.push(path.node.property?.name);
                           }
                         },
@@ -78,20 +78,33 @@ class SWInspector {
                         ArrowFunctionExpression: (path: any) => {
                           path.traverse({
                             ObjectProperty: (path: any) => {
-                              if (path.node.key?.name === "input" && path?.node?.value?.properties) {
+                              if (
+                                path.node.key?.name === 'input' &&
+                                path?.node?.value?.properties
+                              ) {
                                 requiredInputs?.push(
                                   ...path?.node?.value?.properties?.map(
                                     (prop: any) => {
-                                      if (prop.value.type === "Identifier") {
+                                      if (prop.value.type === 'Identifier') {
                                         // TODO: implement recursive function to get all identifiers
                                         return (
                                           prop.value?.name ??
                                           prop.value.left?.name
                                         );
                                       }
-                                    }
-                                  )
+                                    },
+                                  ),
                                 );
+                              }
+                            },
+                            VariableDeclarator: (path: any) => {
+                              if (path.node?.init?.name === 'input') {
+                                path.node?.id?.properties?.map((prop: any) =>
+                                  requiredInputs?.push(prop.key.name),
+                                );
+                              }
+                              if (path.node?.init?.object?.name === 'input') {
+                                requiredInputs?.push(path.node?.id?.name);
                               }
                             },
                           });
@@ -103,7 +116,7 @@ class SWInspector {
                 acc.push({ [contractFunctionName]: [...requiredInputs] });
                 return acc;
               },
-              []
+              [],
             );
             functions = [...functionDetails];
           }
@@ -112,18 +125,18 @@ class SWInspector {
       IfStatement: (path: any) => {
         const condition = path.node.test;
         if (
-          condition.left?.property?.name === "function" ||
-          condition.right?.property?.name === "function"
+          condition.left?.property?.name === 'function' ||
+          condition.right?.property?.name === 'function'
         ) {
-          handlerType ??= "if";
+          handlerType ??= 'if';
           const functionName =
-            condition.left?.property?.name === "function"
+            condition.left?.property?.name === 'function'
               ? condition.right?.value
               : condition.left?.value;
           let requiredInputs: string[] = [];
           path.traverse({
             MemberExpression: (path: any) => {
-              if (path.node.object.property?.name === "input") {
+              if (path.node.object.property?.name === 'input') {
                 requiredInputs.push(path.node.property?.name);
               }
             },
@@ -137,28 +150,27 @@ class SWInspector {
   }
 }
 
+export function getSwitchCases(switchStatement: any) {
+  if (!switchStatement?.cases) {
+    return [];
+  }
+  const cases = switchStatement.cases?.map((node: any) => {
+    const isAwaited = node.consequent[0].argument.type === 'AwaitExpression';
+    const arg = isAwaited
+      ? node.consequent[0].argument.argument
+      : node.consequent[0].argument;
+    const contractFunctionName = node.test?.value;
+    // function args can be identifiers or ObjectExpression
+    const functionName = arg.callee?.name;
+    const functionArgs = arg.arguments;
+    return {
+      functionName,
+      contractFunctionName,
+      functionArgs,
+    };
+  });
 
-
-export function getSwitchCases (switchStatement:any) {
-
-    if (!switchStatement?.cases) {
-        return []
-    }
-    const cases = switchStatement.cases?.map((node: any) => {
-        const isAwaited = node.consequent[0].argument.type === "AwaitExpression";
-        const arg = isAwaited ? node.consequent[0].argument.argument : node.consequent[0].argument;
-        const contractFunctionName = node.test?.value;
-        // function args can be identifiers or ObjectExpression
-        const functionName = arg.callee?.name
-        const functionArgs = arg.arguments
-        return {
-            functionName,
-            contractFunctionName,
-            functionArgs,
-        };
-        });
-
-        return cases
+  return cases;
 }
 
 export default SWInspector;

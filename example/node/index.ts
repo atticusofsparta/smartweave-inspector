@@ -1,15 +1,14 @@
 import SWInspector from "../../src";
-import * as fs from 'fs'
-import path from 'path'
-
+import * as fs from "fs";
+import path from "path";
 
 async function main() {
-    const filePath = path.resolve('./example/contracts/registry.js');
-    const contractSource = fs.readFileSync(filePath, 'utf8');
-    const inspectorGadget = new SWInspector(contractSource);
+  const filePath = path.resolve("../contracts/ant.js");
+  const contractSource = fs.readFileSync(filePath, "utf8");
+  const inspectorGadget = new SWInspector(contractSource);
 
-    const functions = await inspectorGadget.getContractFunctions();
-    console.log(functions);
+  const functions = await inspectorGadget.getContractFunctions();
+  console.log(functions);
 }
 
 main();
