@@ -20,7 +20,7 @@ function Home() {
     try {
       setLoading(true);
       const res = await fetch(
-        `http://dev.arns.app/v1/wallet/${address}/contracts`,
+        `https://dev.arns.app/v1/wallet/${address}/contracts`,
       );
 
       const { contractTxIds } = await res.json();

@@ -20,7 +20,7 @@ function ContractCard({ id }: { id: string }) {
   async function load(id: string) {
     try {
       setLoading(true);
-      const res = await fetch(`http://dev.arns.app/v1/contract/${id}`);
+      const res = await fetch(`https://dev.arns.app/v1/contract/${id}`);
       const { state } = await res.json();
       setContractState(state);
       const contractManifest = await getEvaluationOptions(id);
